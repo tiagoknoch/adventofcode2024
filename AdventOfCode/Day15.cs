@@ -42,121 +42,26 @@ public class Day15 : BaseDay
 
     private (int Row, int Col) ProcessMovement((int Row, int Col) robotCoordinates, char movement)
     {
-        return movement switch
+        var directionOffsets = movement switch
         {
-            '^' => ProcessUp(robotCoordinates),
-            '>' => ProcessRight(robotCoordinates),
-            '<' => ProcessLeft(robotCoordinates),
-            'v' => ProcessDown(robotCoordinates),
+            '^' => (-1, 0),
+            '>' => (0, 1),
+            '<' => (0, -1),
+            'v' => (1, 0),
             _ => throw new InvalidOperationException("Invalid Movement"),
         };
+
+        return ProcessDirection(robotCoordinates, directionOffsets);
     }
 
-    private (int Row, int Col) ProcessDown((int Row, int Col) robotCoordinates)
+    private (int Row, int Col) ProcessDirection((int Row, int Col) robotCoordinates, (int dRow, int dCol) direction)
     {
-        var newCoordinates = (Row: robotCoordinates.Row + 1, Col: robotCoordinates.Col);
+        var newCoordinates = (Row: robotCoordinates.Row + direction.dRow, Col: robotCoordinates.Col + direction.dCol);
         var target = _matrix[newCoordinates.Row][newCoordinates.Col];
+
         if (target == '#')
         {
-            return robotCoordinates;
-        }
-
-        else if (target == '.')
-        {
-            MoveChar(robotCoordinates, newCoordinates);
-            return newCoordinates;
-        }
-        else if (target == 'O')
-        {
-            var tempCoordinates = ProcessDown(newCoordinates);
-            if (tempCoordinates != newCoordinates)
-            {
-                // It moved so we can move.
-                MoveChar(robotCoordinates, newCoordinates);
-                return newCoordinates;
-            }
-            else
-            {
-                // It didn't move so don't move.
-                return robotCoordinates;
-            }
-        }
-
-        throw new InvalidOperationException("Invalid Processing Target");
-    }
-
-    private (int Row, int Col) ProcessRight((int Row, int Col) robotCoordinates)
-    {
-        var newCoordinates = (Row: robotCoordinates.Row, Col: robotCoordinates.Col + 1);
-        var target = _matrix[newCoordinates.Row][newCoordinates.Col];
-        if (target == '#')
-        {
-            return robotCoordinates;
-        }
-
-        else if (target == '.')
-        {
-            MoveChar(robotCoordinates, newCoordinates);
-            return newCoordinates;
-        }
-        else if (target == 'O')
-        {
-            var tempCoordinates = ProcessRight(newCoordinates);
-            if (tempCoordinates != newCoordinates)
-            {
-                //it moved so we can move
-                MoveChar(robotCoordinates, newCoordinates);
-                return newCoordinates;
-            }
-            else
-            {
-                //it didnt move so dont move
-                return robotCoordinates;
-            }
-        }
-
-        throw new InvalidOperationException("Invalid Processing Target");
-    }
-
-    private (int Row, int Col) ProcessUp((int Row, int Col) robotCoordinates)
-    {
-        var newCoordinates = (Row: robotCoordinates.Row - 1, Col: robotCoordinates.Col);
-        var target = _matrix[newCoordinates.Row][newCoordinates.Col];
-        if (target == '#')
-        {
-            return robotCoordinates;
-        }
-
-        else if (target == '.')
-        {
-            MoveChar(robotCoordinates, newCoordinates);
-            return newCoordinates;
-        }
-        else if (target == 'O')
-        {
-            var tempCoordinates = ProcessUp(newCoordinates);
-            if (tempCoordinates != newCoordinates)
-            {
-                //it moved so we can move
-                MoveChar(robotCoordinates, newCoordinates);
-                return newCoordinates;
-            }
-            else
-            {
-                //it didnt move so dont move
-                return robotCoordinates;
-            }
-        }
-        throw new InvalidOperationException("Invalid Processing Target");
-    }
-
-    private (int Row, int Col) ProcessLeft((int Row, int Col) robotCoordinates)
-    {
-        var newCoordinates = (Row: robotCoordinates.Row, Col: robotCoordinates.Col - 1);
-        var target = _matrix[newCoordinates.Row][newCoordinates.Col];
-        if (target == '#')
-        {
-            return robotCoordinates;
+            return robotCoordinates; // Blocked, stay in place
         }
         else if (target == '.')
         {
@@ -165,21 +70,23 @@ public class Day15 : BaseDay
         }
         else if (target == 'O')
         {
-            var tempCoordinates = ProcessLeft(newCoordinates);
+            var tempCoordinates = ProcessDirection(newCoordinates, direction);
             if (tempCoordinates != newCoordinates)
             {
-                //it moved so we can move
+                // The object moved, so we can move
                 MoveChar(robotCoordinates, newCoordinates);
                 return newCoordinates;
             }
             else
             {
-                //it didnt move so dont move
+                // The object didn't move, so we also don't move
                 return robotCoordinates;
             }
         }
+
         throw new InvalidOperationException("Invalid Processing Target");
     }
+
 
     private (int Row, int Col) FindFirstChar(char target)
     {
