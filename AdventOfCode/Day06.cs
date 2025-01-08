@@ -162,7 +162,7 @@ public class Day06 : BaseDay
                 }
             }
         }
-        throw new Exception("Target not found");
+        throw new InvalidOperationException("Target not found");
     }
 
     private (int Row, int Col) GetNewCoords((int Row, int Col) currentCoords, DirectionEnum direction)
@@ -173,7 +173,7 @@ public class Day06 : BaseDay
             DirectionEnum.East => (currentCoords.Row, currentCoords.Col + 1),
             DirectionEnum.South => (currentCoords.Row + 1, currentCoords.Col),
             DirectionEnum.West => (currentCoords.Row, currentCoords.Col - 1),
-            _ => throw new Exception("Invalid direction")
+            _ => throw new InvalidOperationException("Invalid direction")
         };
     }
 
@@ -185,7 +185,7 @@ public class Day06 : BaseDay
             DirectionEnum.South => DirectionEnum.West,
             DirectionEnum.West => DirectionEnum.North,
             DirectionEnum.East => DirectionEnum.South,
-            _ => throw new Exception("Invalid direction"),
+            _ => throw new InvalidOperationException("Invalid direction"),
         };
     }
 }
