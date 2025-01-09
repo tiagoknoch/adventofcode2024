@@ -6,7 +6,7 @@ namespace AdventOfCode;
 public class Day18 : BaseDay
 {
     private readonly IParsedFile _input;
-    private readonly char[][] _grid;
+    private char[][] _grid;
 
     private readonly List<(int x, int y)> _bytes;
     private readonly int _rows = 70 + 1;
@@ -27,6 +27,11 @@ public class Day18 : BaseDay
         _bytes = items.Select(i => (i[0], i[1])).ToList();
 
         //fill grid with .
+        InitializeGrid();
+    }
+
+    private void InitializeGrid()
+    {
         _grid = new char[_rows][];
         for (int i = 0; i < _rows; i++)
         {
@@ -39,14 +44,18 @@ public class Day18 : BaseDay
     }
 
     public override ValueTask<string> Solve_1() => new($"{Solve_1_v1()}");
+    public override ValueTask<string> Solve_2() => new($"{Solve_2_v1()}");
+
+
 
     private int Solve_1_v1()
     {
+        InitializeGrid();
         for (int i = 0; i < 1024; i++)
         {
             _grid[_bytes[i].y][_bytes[i].x] = '#';
         }
-        PrintGrid();
+        //PrintGrid();
 
         var start = (0, 0); // Top-left
         var goal = (70, 70); // Bottom-right
@@ -55,7 +64,33 @@ public class Day18 : BaseDay
         return cost;
     }
 
-    public override ValueTask<string> Solve_2() => throw new NotImplementedException();
+    private string Solve_2_v1()
+    {
+        var start = (0, 0); // Top-left
+        var goal = (70, 70); // Bottom-right
+        bool foundExit = true;
+        int bytesCount = 1024;
+
+        while (foundExit)
+        {
+            InitializeGrid();
+            ++bytesCount;
+            for (int i = 0; i < bytesCount; i++)
+            {
+                _grid[_bytes[i].y][_bytes[i].x] = '#';
+            }
+
+
+            int cost = FindShortestPath(_grid, start, goal);
+            if (cost == -1)
+            {
+                return $"{_bytes[bytesCount - 1].x},{_bytes[bytesCount - 1].y}"; ;
+            }
+        }
+
+        throw new InvalidOperationException("No solution found");
+    }
+
 
     public static int FindShortestPath(char[][] grid, (int Row, int Col) start, (int Row, int Col) goal)
     {
